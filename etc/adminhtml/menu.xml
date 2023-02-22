@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="Magecat_Label::label" title="Product Labels" translate="title" module="Magecat_Label" sortOrder="30" parent="Magento_Catalog::inventory" action="magecat_label/label/" resource="Magento_Backend::admin"/>
+    </menu>
+</config>
