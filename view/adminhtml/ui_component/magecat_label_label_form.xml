@@ -35,7 +35,7 @@
         </settings>
         <dataProvider class="Magecat\Label\Model\Label\DataProvider" name="magecat_label_label_form_data_source">
             <settings>
-                <requestFieldName>id</requestFieldName>
+                <requestFieldName>label_id</requestFieldName>
                 <primaryFieldName>label_id</primaryFieldName>
             </settings>
         </dataProvider>

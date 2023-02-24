@@ -4,7 +4,7 @@ namespace Magecat\Label\Model;
 
 use Magecat\Label\Api\Data;
 use Magecat\Label\Api\LabelRepositoryInterface;
-use Magecat\Label\Model\ResourceModel\Label;
+use Magecat\Label\Model\ResourceModel\Label as LabelResourceModel;
 use Magento\Framework\Exception\CouldNotDeleteException;
 use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\NoSuchEntityException;
@@ -13,9 +13,9 @@ use Magento\Framework\Exception\ValidatorException;
 class LabelRepository implements LabelRepositoryInterface
 {
     /**
-     * @var ResourceModel\Label
+     * @var LabelResourceModel
      */
-    protected ResourceModel\Label $labelResource;
+    protected LabelResourceModel $labelResource;
 
     /**
      * @var LabelFactory
@@ -23,18 +23,14 @@ class LabelRepository implements LabelRepositoryInterface
     protected LabelFactory $labelFactory;
 
     /**
-     * @var array
-     */
-    private array $labels = [];
-
-    /**
-     * @param Label $labelResource
+     * @param LabelResourceModel $labelResource
      * @param LabelFactory $labelFactory
      */
     public function __construct(
-        \Magecat\Label\Model\ResourceModel\Label $labelResource,
-        \Magecat\Label\Model\LabelFactory $labelFactory
-    ) {
+        LabelResourceModel $labelResource,
+        LabelFactory       $labelFactory
+    )
+    {
         $this->labelResource = $labelResource;
         $this->labelFactory = $labelFactory;
     }
@@ -46,7 +42,7 @@ class LabelRepository implements LabelRepositoryInterface
     public function save(Data\LabelInterface $label): Data\LabelInterface
     {
         if ($label->getLabelId()) {
-            $label = $this->get($label->getLabelId())->addData($label->getData());
+            $label = $this->getById($label->getLabelId())->addData($label->getData());
         }
 
         try {
@@ -67,23 +63,16 @@ class LabelRepository implements LabelRepositoryInterface
      * @param int $labelId
      * @return Data\LabelInterface
      */
-    public function get(int $labelId): Data\LabelInterface
+    public function getById(int $labelId): Data\LabelInterface
     {
-        if (!isset($this->labels[$labelId])) {
-            /** @var \Magecat\Label\Model\Label $label */
-            $label = $this->labelFactory->create();
+        $label = $this->labelFactory->create();
+        $this->labelResource->load($label, $labelId);
 
-            /* TODO: change to resource model after entity manager will be fixed */
-            $this->labelResource->load($label, $labelId);
-            if (!$label->getLabelId()) {
-                throw new NoSuchEntityException(
-                    __('The product label with the "%1" ID wasn\'t found. Verify the ID and try again.', $labelId)
-                );
-            }
-            $this->labels[$labelId] = $label;
+        if (!$label->getId()) {
+            throw new NoSuchEntityException(__('Template with id "%1" does not exist.', $labelId));
         }
 
-        return $this->labels[$labelId];
+        return $label;
     }
 
     /**
@@ -110,8 +99,8 @@ class LabelRepository implements LabelRepositoryInterface
      */
     public function deleteById(int $labelId): bool
     {
-        $model = $this->get($labelId);
-        $this->delete($model);
+        $label = $this->getById($labelId);
+        $this->delete($label);
 
         return true;
     }

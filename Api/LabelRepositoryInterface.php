@@ -16,7 +16,7 @@ interface LabelRepositoryInterface
      * @return \Magecat\Label\Api\Data\LabelInterface
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
-    public function get(int $labelId): Data\LabelInterface;
+    public function getById(int $labelId): Data\LabelInterface;
 
     /**
      * @param \Magecat\Label\Api\Data\LabelInterface $label

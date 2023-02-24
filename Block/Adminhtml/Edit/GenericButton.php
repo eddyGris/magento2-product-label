@@ -39,7 +39,7 @@ class GenericButton
     public function getLabelId(): ?int
     {
         try {
-            return $this->labelRepository->get(
+            return $this->labelRepository->getById(
                 $this->context->getRequest()->getParam('label_id')
             )->getId();
         } catch (NoSuchEntityException $e) {

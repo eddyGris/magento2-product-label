@@ -2,75 +2,114 @@
 
 namespace Magecat\Label\Model\Label;
 
-use Magecat\Label\Model\ResourceModel\Label\Collection;
+use Magecat\Label\Api\Data\LabelInterface;
+use Magecat\Label\Api\LabelRepositoryInterface;
+use Magecat\Label\Model\LabelFactory;
 use Magecat\Label\Model\ResourceModel\Label\CollectionFactory;
-use Magecat\Label\Model\Label;
-use Magento\Framework\App\Request\DataPersistorInterface;
-use Magento\Ui\DataProvider\AbstractDataProvider;
+use Magento\Framework\App\ObjectManager;
+use Magento\Framework\App\RequestInterface;
+use Magento\Ui\DataProvider\Modifier\PoolInterface;
+use Magento\Ui\DataProvider\ModifierPoolDataProvider;
 
-class DataProvider extends AbstractDataProvider
+class DataProvider extends ModifierPoolDataProvider
 {
-    /**
-     * @var Collection
-     */
-    protected $collection;
-
     /**
      * @var array
      */
-    protected $loadedData;
+    protected array $loadedData;
 
     /**
-     * @var DataPersistorInterface
+     * @var LabelRepositoryInterface
      */
-    protected $dataPersistor;
+    private LabelRepositoryInterface $labelRepository;
 
     /**
-     * @param string $name
-     * @param string $primaryFieldName
-     * @param string $requestFieldName
-     * @param CollectionFactory $collectionFactory
-     * @param DataPersistorInterface $dataPersistor
+     * @var LabelFactory
+     */
+    private LabelFactory $labelFactory;
+
+    /**
+     * @var RequestInterface
+     */
+    private RequestInterface $request;
+
+    /**
+     * @param $name
+     * @param $primaryFieldName
+     * @param $requestFieldName
+     * @param CollectionFactory $labelCollectionFactory
+     * @param LabelRepositoryInterface $labelRepository
+     * @param LabelFactory $labelFactory
+     * @param RequestInterface $request
      * @param array $meta
      * @param array $data
+     * @param PoolInterface|null $pool
      */
     public function __construct(
         $name,
         $primaryFieldName,
         $requestFieldName,
-        CollectionFactory $collectionFactory,
-        DataPersistorInterface $dataPersistor,
+        CollectionFactory $labelCollectionFactory,
+        LabelRepositoryInterface $labelRepository,
+        LabelFactory $labelFactory,
+        RequestInterface $request,
         array $meta = [],
-        array $data = []
-    ) {
-        $this->collection = $collectionFactory->create();
-        $this->dataPersistor = $dataPersistor;
-        parent::__construct($name, $primaryFieldName, $requestFieldName, $meta, $data);
+        array $data = [],
+        PoolInterface $pool = null,
+    )
+    {
+        parent::__construct($name, $primaryFieldName, $requestFieldName, $meta, $data, $pool);
+        $this->collection = $labelCollectionFactory->create();
+        $this->labelRepository = $labelRepository;
+        $this->labelFactory = $labelFactory;
+        $this->request = $request;
     }
 
     /**
      * @return array
      */
-    public function getData()
+    public function getData(): array
     {
         if (isset($this->loadedData)) {
             return $this->loadedData;
         }
-        $labels = $this->collection->getItems();
-        /** @var Label $label */
-        foreach ($labels as $label) {
-            $label->load($label->getId());
-            $this->loadedData[$label->getId()] = $label->getData();
-        }
 
-        $data = $this->dataPersistor->get('label');
-        if (!empty($data)) {
-            $label = $this->collection->getNewEmptyItem();
-            $label->setData($data);
-            $this->loadedData[$label->getId()] = $label->getData();
-            $this->dataPersistor->clear('label');
-        }
+        $label = $this->getCurrentLabel();
+        $this->loadedData[$label->getId()] = $label->getData();
 
         return $this->loadedData;
+    }
+
+    /**
+     * @return LabelInterface
+     */
+    private function getCurrentLabel(): LabelInterface
+    {
+        $labelId = $this->getLabelId();
+        if ($labelId) {
+            try {
+                $label = $this->labelRepository->getById($labelId);
+            } catch (LocalizedException $exception) {
+                $label = $this->labelFactory->create();
+            }
+
+            return $label;
+        }
+
+        if (empty($data)) {
+            return $this->labelFactory->create();
+        }
+
+        return $this->labelFactory->create()->setData($data);
+    }
+
+    /**
+     * Returns current product label id from request
+     *
+     * @return int
+     */
+    private function getLabelId(): int
+    {
+        return (int)$this->request->getParam($this->getRequestFieldName());
     }
 }

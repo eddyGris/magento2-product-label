@@ -130,7 +130,7 @@
                 <label translate="true">Name</label>
             </settings>
         </column>
-        <actionsColumn name="actions" class="Magento\Cms\Ui\Component\Listing\Column\PageActions">
+        <actionsColumn name="actions" class="Magecat\Label\Ui\Component\Listing\Column\LabelActions">
             <settings>
                 <indexField>label_id</indexField>
                 <resizeEnabled>false</resizeEnabled>
