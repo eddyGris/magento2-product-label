@@ -6,8 +6,13 @@ use Magecat\Label\Api\Data\LabelInterface;
 use Magecat\Label\Api\LabelRepositoryInterface;
 use Magecat\Label\Model\LabelFactory;
 use Magecat\Label\Model\ResourceModel\Label\CollectionFactory;
-use Magento\Framework\App\ObjectManager;
+use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\App\RequestInterface;
+use Magento\Framework\File\Mime;
+use Magento\Framework\Filesystem;
+use Magento\Framework\Filesystem\Directory\ReadInterface;
+use Magento\Framework\UrlInterface;
+use Magento\Store\Model\StoreManagerInterface;
 use Magento\Ui\DataProvider\Modifier\PoolInterface;
 use Magento\Ui\DataProvider\ModifierPoolDataProvider;
 
@@ -34,6 +39,21 @@ class DataProvider extends ModifierPoolDataProvider
     private RequestInterface $request;
 
     /**
+     * @var StoreManagerInterface
+     */
+    private StoreManagerInterface $storeManager;
+
+    /**
+     * @var ReadInterface
+     */
+    private ReadInterface $mediaDirectory;
+
+    /**
+     * @var Mime
+     */
+    private Mime $mime;
+
+    /**
      * @param $name
      * @param $primaryFieldName
      * @param $requestFieldName
@@ -41,6 +61,9 @@ class DataProvider extends ModifierPoolDataProvider
      * @param LabelRepositoryInterface $labelRepository
      * @param LabelFactory $labelFactory
      * @param RequestInterface $request
+     * @param StoreManagerInterface $storeManager
+     * @param Filesystem $filesystem
+     * @param Mime $mime
      * @param array $meta
      * @param array $data
      * @param PoolInterface|null $pool
@@ -53,9 +76,12 @@ class DataProvider extends ModifierPoolDataProvider
         LabelRepositoryInterface $labelRepository,
         LabelFactory $labelFactory,
         RequestInterface $request,
+        StoreManagerInterface $storeManager,
+        Filesystem $filesystem,
+        Mime $mime,
         array $meta = [],
         array $data = [],
-        PoolInterface $pool = null,
+        PoolInterface $pool = null
     )
     {
         parent::__construct($name, $primaryFieldName, $requestFieldName, $meta, $data, $pool);
@@ -63,6 +89,9 @@ class DataProvider extends ModifierPoolDataProvider
         $this->labelRepository = $labelRepository;
         $this->labelFactory = $labelFactory;
         $this->request = $request;
+        $this->storeManager = $storeManager;
+        $this->mediaDirectory = $filesystem->getDirectoryRead(DirectoryList::MEDIA);
+        $this->mime = $mime;
     }
 
     /**
@@ -75,7 +104,28 @@ class DataProvider extends ModifierPoolDataProvider
         }
 
         $label = $this->getCurrentLabel();
-        $this->loadedData[$label->getId()] = $label->getData();
+
+        $labelData = $label->getData();
+
+        if (isset($labelData['product_image'])) {
+            $image = $labelData['product_image'];
+
+            $imageDirectory = 'tmp/magecat_label/images/';
+            $baseUrl = $this->storeManager->getStore()->getBaseUrl(UrlInterface::URL_TYPE_MEDIA);
+
+            $imageUrl = $baseUrl . $imageDirectory . $image;
+
+            $fullImagePath = $this->mediaDirectory->getAbsolutePath($imageDirectory) . $image;
+            $stat = $this->mediaDirectory->stat($fullImagePath);
+
+            $labelData['product_image'] = null;
+            $labelData['product_image'][0]['url'] = $imageUrl;
+            $labelData['product_image'][0]['name'] = $image;
+            $labelData['product_image'][0]['size'] = $stat['size'];
+            $labelData['product_image'][0]['type'] = $this->mime->getMimeType($fullImagePath);
+        }
+
+        $this->loadedData[$label->getId()] = $labelData;
 
         return $this->loadedData;
     }

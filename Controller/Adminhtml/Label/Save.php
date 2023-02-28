@@ -52,6 +52,12 @@ class Save extends Action implements HttpPostActionInterface
                 $data['label_id'] = null;
             }
 
+            if (!empty($data['product_image'][0]['name']) && isset($data['product_image'][0]['tmp_name'])) {
+                $data['product_image'] = $data['product_image'][0]['name'];
+            } else {
+                unset($data['product_image']);
+            }
+
             $label = $this->labelFactory->create();
 
             $labelId = $this->getRequest()->getParam('label_id');

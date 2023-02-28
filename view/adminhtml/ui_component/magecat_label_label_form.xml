@@ -74,5 +74,22 @@
                 <dataScope>name</dataScope>
             </settings>
         </field>
+        <field name="product_image" formElement="imageUploader">
+            <settings>
+                <label translate="true">Logo Image</label>
+                <componentType>imageUploader</componentType>
+            </settings>
+            <formElements>
+                <imageUploader>
+                    <settings>
+                        <allowedExtensions>jpg jpeg gif png</allowedExtensions>
+                        <maxFileSize>2097152</maxFileSize>
+                        <uploaderConfig>
+                            <param xsi:type="string" name="url">magecat_label/label_image/upload</param>
+                        </uploaderConfig>
+                    </settings>
+                </imageUploader>
+            </formElements>
+        </field>
     </fieldset>
 </form>
