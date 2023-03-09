@@ -1,10 +1,10 @@
 <?php
 
-namespace Magecat\Label\Block\Adminhtml\Edit;
+namespace Magecat\Label\Block\Adminhtml\Label\Edit;
 
-use Magento\Ui\Component\Control\Container;
+use Magento\Framework\View\Element\UiComponent\Control\ButtonProviderInterface;
 
-class SaveButton
+class SaveButton extends GenericButton implements ButtonProviderInterface
 {
     /**
      * Get button data

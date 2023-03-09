@@ -1,6 +1,6 @@
 <?php
 
-namespace Magecat\Label\Block\Adminhtml\Edit;
+namespace Magecat\Label\Block\Adminhtml\Label\Edit;
 
 use Magecat\Label\Api\LabelRepositoryInterface;
 use Magento\Backend\Block\Widget\Context;

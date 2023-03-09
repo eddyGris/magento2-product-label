@@ -2,33 +2,38 @@
 
 namespace Magecat\Label\Api;
 
+use Magecat\Label\Api\Data\LabelInterface;
+use Magento\Framework\Exception\CouldNotDeleteException;
+use Magento\Framework\Exception\CouldNotSaveException;
+use Magento\Framework\Exception\NoSuchEntityException;
+
 interface LabelRepositoryInterface
 {
     /**
-     * @param \Magecat\Label\Api\Data\LabelInterface $label
-     * @return \Magecat\Label\Api\Data\LabelInterface
-     * @throws \Magento\Framework\Exception\CouldNotSaveException
+     * @param LabelInterface $label
+     * @return LabelInterface
+     * @throws CouldNotSaveException
      */
-    public function save(\Magecat\Label\Api\Data\LabelInterface $label): Data\LabelInterface;
+    public function save(LabelInterface $label): Data\LabelInterface;
 
     /**
      * @param int $labelId
-     * @return \Magecat\Label\Api\Data\LabelInterface
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @return LabelInterface
+     * @throws NoSuchEntityException
      */
     public function getById(int $labelId): Data\LabelInterface;
 
     /**
-     * @param \Magecat\Label\Api\Data\LabelInterface $label
+     * @param LabelInterface $label
      * @return bool
-     * @throws \Magento\Framework\Exception\CouldNotDeleteException
+     * @throws CouldNotDeleteException
      */
-    public function delete(\Magecat\Label\Api\Data\LabelInterface $label): bool;
+    public function delete(LabelInterface $label): bool;
 
     /**
      * @param int $labelId
      * @return bool
-     * @throws \Magento\Framework\Exception\CouldNotDeleteException
+     * @throws CouldNotDeleteException
      */
     public function deleteById(int $labelId): bool;
 }

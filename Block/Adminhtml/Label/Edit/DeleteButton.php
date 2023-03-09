@@ -1,6 +1,6 @@
 <?php
 
-namespace Magecat\Label\Block\Adminhtml\Edit;
+namespace Magecat\Label\Block\Adminhtml\Label\Edit;
 
 use Magento\Framework\View\Element\UiComponent\Control\ButtonProviderInterface;
 

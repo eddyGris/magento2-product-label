@@ -8,6 +8,7 @@ use Magento\Backend\App\Action;
 use Magento\Backend\Model\View\Result\Page;
 use Magento\Framework\App\Action\HttpGetActionInterface;
 use Magento\Framework\Controller\ResultInterface;
+use Magento\Framework\Registry;
 use Magento\Framework\View\Result\PageFactory;
 
 class Edit extends Action implements HttpGetActionInterface
@@ -27,17 +28,21 @@ class Edit extends Action implements HttpGetActionInterface
      */
     protected PageFactory $resultPageFactory;
 
+    protected Registry $coreRegistry;
+
     public function __construct(
         Action\Context     $context,
         LabelResourceModel $labelResource,
         LabelFactory       $labelFactory,
         PageFactory        $resultPageFactory,
+        Registry           $coreRegistry,
     )
     {
         parent::__construct($context);
         $this->labelResource = $labelResource;
         $this->labelFactory = $labelFactory;
         $this->resultPageFactory = $resultPageFactory;
+        $this->coreRegistry = $coreRegistry;
     }
 
     /**
@@ -76,6 +81,8 @@ class Edit extends Action implements HttpGetActionInterface
                 return $resultRedirect->setPath('*/*/');
             }
         }
+
+        $this->coreRegistry->register('current_magecat_label', $label);
 
         // 5. Build edit form
         $resultPage = $this->_initAction();

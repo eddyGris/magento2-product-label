@@ -9,9 +9,8 @@
     </argument>
     <settings>
         <buttons>
-            <button name="delete" class="Magento\CatalogRule\Block\Adminhtml\Edit\DeleteButton"/>
-            <button name="save_and_continue" class="Magento\CatalogRule\Block\Adminhtml\Edit\SaveAndContinueButton"/>
-            <button name="save" class="Magento\CatalogRule\Block\Adminhtml\Edit\SaveButton"/>
+            <button name="delete" class="Magecat\Label\Block\Adminhtml\Label\Edit\DeleteButton"/>
+            <button name="save" class="Magecat\Label\Block\Adminhtml\Label\Edit\SaveButton"/>
             <button name="back">
                 <url path="*/*/"/>
                 <class>back</class>
@@ -92,4 +91,20 @@
             </formElements>
         </field>
     </fieldset>
+    <htmlContent name="block_magecat_label_edit_tab_conditions" sortOrder="20">
+        <argument name="data" xsi:type="array">
+            <item name="wrapper" xsi:type="array">
+                <item name="label" xsi:type="string" translate="true">Product Conditions</item>
+                <item name="collapsible" xsi:type="boolean">true</item>
+                <item name="opened" xsi:type="boolean">false</item>
+            </item>
+        </argument>
+        <settings>
+            <wrapper>
+                <canShow>true</canShow>
+                <componentType>fieldset</componentType>
+            </wrapper>
+        </settings>
+        <block class="Magecat\Label\Block\Adminhtml\Label\Edit\Tab\Conditions" name="magecat_label_edit_tab"/>
+    </htmlContent>
 </form>
